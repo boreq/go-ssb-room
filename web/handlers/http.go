@@ -365,7 +365,6 @@ func New(
 	m.Get(router.OpenModeCreateInvite).HandlerFunc(r.HTML("admin/invite-created.tmpl", ih.createOpenMode))
 
 	// static assets
-
 	m.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(web.Assets)))
 
 	// TODO: doesnt work because of of mainMux wrapper, see issue #35
@@ -375,12 +374,6 @@ func New(
 
 	// hook up main stdlib mux to the gorrilla/mux with named routes
 	// TODO: issue #35
-
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
-
-	m.PathPrefix("/test").HandlerFunc(IndexHandler2("../../web/assets/index.html"))
-	m.PathPrefix("/").HandlerFunc(IndexHandler("../../web/assets/index.html"))
-
 	mainMux.Handle("/", m)
 
 	consumeURL := urlTo(router.CompleteInviteConsume)
@@ -430,22 +423,4 @@ func concatTemplates(lst ...[]string) []string {
 
 	}
 	return catted
-}
-
-func IndexHandler2(entrypoint string) func(w http.ResponseWriter, r *http.Request) {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		// fmt.Fprint(w, web.Assets)
-		http.ServeFile(w, r, entrypoint)
-	}
-
-	return http.HandlerFunc(fn)
-}
-
-func IndexHandler(entrypoint string) func(w http.ResponseWriter, r *http.Request) {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		// fmt.Fprint(w, web.Assets)
-		http.ServeFile(w, r, entrypoint)
-	}
-
-	return http.HandlerFunc(fn)
 }
